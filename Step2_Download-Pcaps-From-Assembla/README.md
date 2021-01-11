@@ -11,3 +11,12 @@ Give its path in the script
 
 Step4:
 Run the script using the powershell.
+
+
+# After downloading, rename folders with productID and appnames.
+
+Run the script: rename_folders.py
+
+put this script in the same folder where all the downloaded attachements are present.
+
+This script takes the input of assembla validated data named as "assembla_data" (output of validation script)
