@@ -5,19 +5,31 @@ It includes the validation for the inputs in assembla.
 Below is the list of validations it entertains:
 
 
-1) Http-version
+* Attachments names against each activity.
 
-2) Personal vs Corporate
+* Http version field.
 
-3) File names validation
+* Personal vs Corporate.
 
-4) Multiple values validation against multiple activities
+* Http host (pattern matching).
 
-5) Login-LoginFail Depth validation
+* Http uri path (pattern matching).
 
-6) Uri path validation (pattern matching)
+* Login-LoginFail depth verification.
 
-7) Host validation (pattern matching)
+* Response field only be filled for login and login-fail.
+
+* Response should not be filled for another activity.
+
+* Multiple Request methods, then all fields will be of same size.
+
+* Request method should not be empty.
+
+* If request method is NA or REMAINING then all fields should be empty.
+
+* If request method is filled then atleast host should be filled.
+
+* Attachments counts should be same as the activities performed.
 
 
 
