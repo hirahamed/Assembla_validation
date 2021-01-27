@@ -119,49 +119,39 @@ def evaluate_hs(appname,activity_name,sequence_no):
 	return '1' #NEEDS TO BE FIXED AFTER
 
 def get_hs(appname, activity_name,sign):
-	
-	# print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-	# print(activity_name)
+
 	signatures = sign.split('!!!!')
 	value = ''
 	value_list = []
+
+	#Empty
 	if sign == 'NA' or sign == 'REMAINING' or sign == '' or sign == '<and></and>':
 		return ''
 	
-	if len(signatures) > 1: #NEEDS TO BE FIXED
-		# pprint(signatures[0])
-		if signatures[0].find('http-req-message-body')!=-1 or signatures[0].find('http-rsp-code')!=-1 or signatures[0].find('http-rsp-headers')!=-1 or signatures[0].find('panav-rsp-html-message-body')!=-1:
-				value = value + 'False'
-		else:
-			if evaluate_hs(appname,activity_name,'0') == '0':
-				value = value + 'True'
+	#Multiple
+	if len(signatures) > 1:
+		for i in range(0,len(signatures)) :
+			if signatures[i].find('http-req-message-body')!=-1 or signatures[i].find('http-rsp-code')!=-1 or signatures[i].find('http-rsp-headers')!=-1 or signatures[i].find('panav-rsp-html-message-body')!=-1:
+				value_list.append('False')
 			else:
-				# value = value + " "
-				value = value + 'False' #XML NOT APPEAR
+				if evaluate_hs(appname,activity_name,str(i)) == '0':
+					value_list.append('True')
+				else:
+					value_list.append('False')
 
-		for i in range(1,len(signatures)) :
-			if i == '<and></and>':
-				value = ""
-				continue
-			value = value +'!!!!' + 'False'
+		value = '!!!!'.join(value_list)
+		
 		return value
 
-	if sign.find('http-req-message-body')!=-1 or sign.find('http-rsp-code')!=-1 or sign.find('http-rsp-headers')!=-1 or sign.find('panav-rsp-html-message-body')!=-1:
+	#Single
+	if signatures[0].find('http-req-message-body')!=-1 or signatures[0].find('http-rsp-code')!=-1 or signatures[0].find('http-rsp-headers')!=-1 or signatures[0].find('panav-rsp-html-message-body')!=-1:
 		value = 'False'
 	else:
 		if evaluate_hs(appname,activity_name,'0') == '0':
 			value = 'True'
 		else:
-			# value = " " #XML NOT APPEAR
 			value = 'False'
-
-
 	return value	
-	# if activity_name == 'SHARE':
-	# 	print('in geths')
-	# 	print(evaluate_hs(appname,activity_name,'0'))
-	# 	print(value)
-
 
 def evaluate_attachments(act_list):
 
@@ -213,7 +203,7 @@ def write_csv():
 		act_share = evaluate_empty(value['activities']['SHARE_'])
 		act_read_only = evaluate_empty(value['activities']['READ-ONLY_'])
 
-		print('LOGOUT ACTIVITY : ',act_logout)
+		# print('LOGOUT ACTIVITY : ',act_logout)
 		scp_login = evaluate_scope(value['activities']['LOGIN_'])
 		scp_login_fail = evaluate_scope(value['activities']['LOGIN-FAIL_'])
 		scp_logout= evaluate_scope(value['activities']['LOGOUT_'])
@@ -223,18 +213,19 @@ def write_csv():
 		scp_share = evaluate_scope(value['activities']['SHARE_'])
 		scp_read_only = evaluate_scope(value['activities']['READ-ONLY_'])
 
-		print('LOGOUT SCOPE : ', scp_logout)
+		# print('LOGOUT SCOPE : ', scp_logout)
 
-		hs_login = get_hs(product_name,'LOGIN' ,value['activities']['LOGIN_'])
-		hs_login_fail = get_hs(product_name, 'LOGIN-FAIL',value['activities']['LOGIN-FAIL_'])
-		hs_logout = get_hs(product_name, 'LOGOUT',value['activities']['LOGOUT_'])
-		hs_upload = get_hs(product_name, 'UPLOAD',value['activities']['UPLOAD_'])
-		hs_download = get_hs(product_name, 'DOWNLOAD',value['activities']['DOWNLOAD_'])
-		hs_delete = get_hs(product_name, 'DELETE',value['activities']['DELETE_'])
-		hs_share = get_hs(product_name, 'SHARE',value['activities']['SHARE_'])
-		hs_read_only = get_hs(product_name, 'READ-ONLY',value['activities']['READ-ONLY_'])
+		hs_login = get_hs(product_name,'LOGIN' ,html_decode(act_login))
+		hs_login_fail = get_hs(product_name, 'LOGIN-FAIL',html_decode(act_login_fail))
+		hs_logout = get_hs(product_name, 'LOGOUT',html_decode(act_logout))
+		hs_upload = get_hs(product_name, 'UPLOAD',html_decode(act_upload))
+		hs_download = get_hs(product_name, 'DOWNLOAD',html_decode(act_download))
+		hs_delete = get_hs(product_name, 'DELETE',html_decode(act_delete))
+		hs_share = get_hs(product_name, 'SHARE',html_decode(act_share))
+		hs_read_only = get_hs(product_name, 'READ-ONLY',html_decode(act_read_only))
 
-		print('hs_logout : ',hs_logout)
+
+		# print('hs_logout : ',hs_logout)
 		attachments,tcp = evaluate_attachments([act_login,act_login_fail,act_logout,act_upload,act_download,act_delete,act_share,act_read_only])
 
 		csv_writer.writerow([key,product_name,'','',Personal,Corporate,http_version,
